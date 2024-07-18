@@ -1,0 +1,131 @@
+﻿
+<h1>List of products</h1>
+<div class="cus-form-general">
+    <div class="box-content">
+        <div class="New_Table table-relative">
+            <div class="groupSearch">
+                <div class="groupFilter">
+                    <div class="row">
+                        <div class="col-md-5 form-group">
+                            <select style="width:100%" class="js-example-basic-multiple" name="states[]" multiple="multiple" id="SelectOpt">
+                                <option value="AL">Alabama</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 form-group">
+                            <div class="search-view">
+                                <button type="button" id="btn-search" class="btn btn-success">Search</button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-7">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-tree-wrapper"  style="width:100%">
+                <div style="margin:0 auto;">
+                    <table id="dataTableProduct" class="table-border row-border compact " cellspacing="0">
+                        <thead>
+                            <tr class="table-primary">
+                                <th>Stt</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        var url = window.location;
+        // URL API
+        var APIURL = url.protocol + "//" + url.hostname + ":" + url.port;
+        let URLCheck = window.location.href
+        let arr = [];
+        $('.js-example-basic-multiple').select2();
+        $.ajax({
+            async: false,
+            type: 'get',
+            url: getUrlCurrent() + "/API/CategoryApi/Gets",
+            success: function(data) {
+                if (data.isSuccessed) {
+                    let htmlString = ''
+                    for (let i = 0; i < data.resultObj.length; i++) {
+                        htmlString = htmlString + `<option value="${data.resultObj[i].id}">${data.resultObj[i].name}</option>`
+                    }
+                $("#SelectOpt").html(htmlString);
+                }
+            },
+            error: function(err) {
+                alert('Lỗi load dữ liệu, vui lòng thử lại sau!');
+            }
+        });
+        $("#btn-search").on("click", function() {
+            let ArrFilter = $("#SelectOpt").val()
+            let ResultOfFilter = []
+            let result = []
+            console.log($("#SelectOpt").val(),'alooo')
+            for (let i = 0; i < ArrFilter.length; i++) {
+                result =  arr.filter((k) => {return k.categoryId == ArrFilter[i] })
+                ResultOfFilter.push(...result)
+            }
+             $("#dataTableProduct").DataTable().clear();
+             $("#dataTableProduct").DataTable().rows.add(ResultOfFilter); // Add new data
+             $("#dataTableProduct").DataTable().draw(); // Redraw the DataTable
+                    
+        })
+        $("#dataTableProduct").dataTable({
+            "dom": '<"top area-filter"f>rti<"page-record-custom"lp>',
+            "autoWidth": false,
+            "ordering": false,
+            "bInfo": false,
+            "bLengthChange": false,
+            "filter": false,
+            "language": {
+                "sProcessing": "Đang xử lý...",
+                "sLengthMenu": "Hiện: _MENU_",
+                "sZeroRecords": "Không có dữ liệu",
+                "sEmptyTable": "Bảng trống",
+                "sInfo": "Hiện dòng _START_ đến _END_ trong tổng _TOTAL_ dòng",
+                "sInfoEmpty": "Hiện dòng 0 đến 0 trong tổng 0 dòng",
+                "sSearch": "Tìm kiếm",
+                "sLoadingRecords": "Đang tải...",
+                // "paginate": {
+                //     next: '<span class="material-symbols-rounded">chevron_right</span>',
+                //     previous: '<span class="material-symbols-rounded">chevron_left</span>'
+                // }
+            },
+            "ajax": {
+                url: getUrlCurrent() + "/API/ProductApi/Gets",
+                type: "GET",
+                dataSrc: function(data) {
+                    if (data.isSuccessed) {
+                        for (let i = 0; i < data.resultObj.length; i++) {
+                            data.resultObj[i].STT = i + 1;
+                        }
+                        arr = data.resultObj;
+                        return data.resultObj;
+                    }
+                    return []
+                   
+                },
+            },
+            "columnDefs": [],
+            "columns": [
+                { "data": "STT", "width": "60px", "class": "STT-text center-align text-center" },
+                { "data": "name", "width": "auto", "class": "text-left name-text" },
+                { "data": "price", "width": "130px", "class": "text-center group-icon-action " },
+                { "data": "categoryId", "width": "130px", "class": "text-center group-icon-action " },
+            ]
+        })
+        //
+    })
+
+
+</script>

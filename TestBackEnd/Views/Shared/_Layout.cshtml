@@ -1,0 +1,191 @@
+﻿﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bài test Trần Ngọc Rin</title>
+
+    @*Jquery*@
+    <script src="~/tools/jquery/dist/jquery.js"></script>
+    <script src="~/tools/datetimepicker/jquery-ui.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <!--datatable-->
+    <script src="~/tools/DataTables/jquery.dataTables.min.js"></script>
+    <!--select2-->
+    <script src="~/tools/select2/select2.min.js"></script>
+    <link href="~/tools/select2/select2.min.css" rel="stylesheet">
+    <link href="~/tools/select2/select2-bootstrap4.min.css" rel="stylesheet">
+
+    @*boostrap*@
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/css/datatables.css" rel="stylesheet" />
+
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="nav-link text-dark" href="/Home">Home</a>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/swagger/index.html">API SWAGGER</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+        </div>
+    </footer>
+
+    <script>
+        var getUrlCurrent = () => {
+            var url = window.location;
+            var APIURL = url.protocol + "//" + url.hostname + ":" + url.port;
+
+            return APIURL
+        }
+        var isCheckStringEmpty = (str) => {
+            if (str == null || str.trim().length === 0) {
+                return true
+            }
+            return false
+        }
+
+        var getApiAjaxJson = (url, type, data) => {
+            let urlBase = getUrlCurrent()
+
+            if (data) {
+                return $.ajax({
+                    type: type,
+                    url: urlBase + url,
+                    contentType: "application/json; charset=utf-8",
+                    data: data
+                });
+            }
+
+            return $.ajax({
+                type: type,
+                url: urlBase + url,
+                contentType: "application/json; charset=utf-8"
+            });
+        }
+        var getApiAjaxAuthorizeJWT = (url, type, data, token) => {
+            let urlBase = getUrlCurrent()
+
+            if (data) {
+                return $.ajax({
+                    type: type,
+                    url: urlBase + url,
+                    contentType: "application/json; charset=utf-8",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization',
+                            "Bearer " + token);
+                    },
+                    data: data,
+                });
+            }
+
+            return $.ajax({
+                type: type,
+                url: urlBase + url,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization',
+                        "Bearer " + token);
+                },
+            });
+        }
+        var getApiAjaxAuthorizeCookie = (url, type, data, cookie) => {
+            let urlBase = getUrlCurrent()
+
+            if (data) {
+                return $.ajax({
+                    type: type,
+                    url: urlBase + url,
+                    headers: {
+                        "Cookie": `.LVSport.Cookie=${cookie}`
+                    },
+                    contentType: "application/json; charset=utf-8",
+                    data: data
+                });
+            }
+
+            return $.ajax({
+                type: type,
+                url: urlBase + url,
+                headers: {
+                    "Cookie": `.LVSport.Cookie=${cookie}`
+                },
+                contentType: "application/json; charset=utf-8"
+            });
+        }
+        var getApiAjaxUploadFile = (url, type, data) => {
+            let urlBase = getUrlCurrent()
+
+            return $.ajax({
+                type: type,
+                url: urlBase + url,
+                processData: false,
+                contentType: false,
+                data: data
+            });
+        }
+        var formatDatePhoTo = () => {
+            var d = new Date(),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear(),
+                hour = d.getHours(),
+                minute = d.getMinutes(),
+                second = d.getSeconds()
+
+            if (month.length < 2) month = '0' + month
+            if (day.length < 2) day = '0' + day
+            if (hour.length < 2) hour = '0' + hour
+            if (minute.length < 2) minute = '0' + minute
+            if (second.length < 2) second = '0' + second
+
+            return [year, month, day, hour, minute, second].join('')
+        }
+        var formatDateToSearch = (date) => {
+            if (date != null && date != "") {
+                const newdate = date.split("/").reverse().join("-");
+
+                return newdate;
+            }
+
+            return null;
+        };
+        var formatDatetime = (date) => {
+            if (date != null && date != "") {
+                var d = new Date(date),
+                    month = '' + (d.getMonth() + 1),
+                    day = '' + d.getDate(),
+                    year = d.getFullYear()
+
+                if (month.length < 2) month = '0' + month
+                if (day.length < 2) day = '0' + day
+
+                return [day, month, year].join('/');
+            }
+
+            return "";
+        };
+        const formatNumber = (num) => {
+            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
+        }
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
